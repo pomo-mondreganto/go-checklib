@@ -1,3 +1,5 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/pomo-mondreganto/go-checklib)](https://goreportcard.com/report/github.com/pomo-mondreganto/go-checklib)
+
 # go-checklib
 Library for A&amp;D CTF checker writing in Go
 
