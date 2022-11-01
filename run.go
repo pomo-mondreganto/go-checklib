@@ -6,9 +6,6 @@ import (
 	"os"
 	"strconv"
 	"time"
-
-	"github.com/pomo-mondreganto/go-checklib/require"
-	o "github.com/pomo-mondreganto/go-checklib/require/options"
 )
 
 // Run returns exit code.
@@ -63,13 +60,9 @@ func Run(checker Checker) int {
 			}
 
 			vuln, err := strconv.Atoi(os.Args[5])
-			require.NoError(
-				c,
-				err,
-				"error calling checker",
-				o.CheckFailed(),
-				o.Private("invalid vuln"),
-			)
+			if err != nil {
+				CheckFailed(c, "error calling checker", "invalid vuln number")
+			}
 
 			checker.Put(c, os.Args[2], os.Args[3], os.Args[4], vuln)
 		case "get":
@@ -78,13 +71,9 @@ func Run(checker Checker) int {
 			}
 
 			vuln, err := strconv.Atoi(os.Args[5])
-			require.NoError(
-				c,
-				err,
-				"error calling checker",
-				o.CheckFailed(),
-				o.Private("invalid vuln"),
-			)
+			if err != nil {
+				CheckFailed(c, "error calling checker", "invalid vuln number")
+			}
 
 			checker.Get(c, os.Args[2], os.Args[3], os.Args[4], vuln)
 		default:
