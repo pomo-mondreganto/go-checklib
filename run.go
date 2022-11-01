@@ -3,9 +3,12 @@ package checklib
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"os"
+	"strconv"
 	"time"
+
+	"github.com/pomo-mondreganto/go-checklib/require"
+	o "github.com/pomo-mondreganto/go-checklib/require/options"
 )
 
 // Run returns exit code.
@@ -42,11 +45,7 @@ func Run(checker Checker) int {
 		}()
 
 		if len(os.Args) < 2 {
-			c.Finish(
-				VerdictCheckFailed,
-				"error calling checker",
-				"missing command",
-			)
+			CheckFailed(c, "error calling checker", "missing command")
 		}
 
 		switch cmd := os.Args[1]; cmd {
@@ -55,35 +54,41 @@ func Run(checker Checker) int {
 			c.Finish(VerdictOK, string(data), "")
 		case "check":
 			if len(os.Args) < 3 {
-				c.Finish(
-					VerdictCheckFailed,
-					"error calling checker",
-					"missing host argument",
-				)
+				CheckFailed(c, "error calling checker", "missing host")
 			}
 			checker.Check(c, os.Args[2])
-		// case "put":
-		// 	if len(os.Args) < 6 {
-		// 		c.Finish(
-		// 			VerdictCheckFailed,
-		// 			"error calling checker",
-		// 			"missing arguments",
-		// 		)
-		// 	}
-		//
-		// 	err = cmd.Put(ctx, os.Args[2], os.Args[3], os.Args[4], os.Args[5])
-		// case "get":
-		// 	if len(os.Args) < 6 {
-		// 		err = fmt.Errorf("bad args: %d", len(os.Args))
-		// 		return
-		// 	}
-		// 	err = cmd.Get(ctx, os.Args[2], os.Args[3], os.Args[4], os.Args[5])
-		default:
-			c.Finish(
-				VerdictCheckFailed,
+		case "put":
+			if len(os.Args) < 6 {
+				CheckFailed(c, "error calling checker", "missing arguments")
+			}
+
+			vuln, err := strconv.Atoi(os.Args[5])
+			require.NoError(
+				c,
+				err,
 				"error calling checker",
-				fmt.Sprintf("bad command: %s", cmd),
+				o.CheckFailed(),
+				o.Private("invalid vuln"),
 			)
+
+			checker.Put(c, os.Args[2], os.Args[3], os.Args[4], vuln)
+		case "get":
+			if len(os.Args) < 6 {
+				CheckFailed(c, "error calling checker", "missing arguments")
+			}
+
+			vuln, err := strconv.Atoi(os.Args[5])
+			require.NoError(
+				c,
+				err,
+				"error calling checker",
+				o.CheckFailed(),
+				o.Private("invalid vuln"),
+			)
+
+			checker.Get(c, os.Args[2], os.Args[3], os.Args[4], vuln)
+		default:
+			CheckFailed(c, "error calling checker", "bad command: %s", cmd)
 		}
 	}()
 
