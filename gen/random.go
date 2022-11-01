@@ -3,6 +3,7 @@ package gen
 import (
 	"math/rand"
 	"strings"
+	"unicode"
 
 	"github.com/pomo-mondreganto/go-checklib"
 	"github.com/pomo-mondreganto/go-checklib/require"
@@ -79,7 +80,7 @@ func Sentence() string {
 	for i := 0; i < size; i++ {
 		word := Word()
 		if i == 0 {
-			word = strings.ToTitle(word)
+			word = capitalize(word)
 		}
 		if i == size-1 {
 			word += "."
@@ -101,4 +102,13 @@ func Sentences(count int) string {
 
 func Paragraph() string {
 	return Sentences(RandInt(2, 10))
+}
+
+func capitalize(s string) string {
+	if s == "" {
+		return s
+	}
+	r := []rune(s)
+	r[0] = unicode.ToUpper(r[0])
+	return string(r)
 }
